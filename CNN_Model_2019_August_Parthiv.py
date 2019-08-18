@@ -9,22 +9,32 @@ from shutil import move
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from sklearn.model_selection import train_test_split
+from tensorflow.keras import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-tfe.compat.v1.enable_eager_execution()
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Dropout, Flatten
+from tensorflow.keras.optimizers import RMSprop
+# Import the inception model  
+from tensorflow.keras.applications.inception_v3 import InceptionV3
+
+tfe.enable_eager_execution()
 
 zip_data_file = "https://s3-ap-southeast-1.amazonaws.com/he-public-data/DL%23+Beginner.zip"
 zip_extract_location = "C:\\Users\\ParthivNaresh\\Documents\\animals_dataset"
 
-data_directory = zip_extract_location + "\\data\\"
-training_directory = zip_extract_location + "\\train\\"
-testing_directory = zip_extract_location + "\\test\\"
-predicting_directory = zip_extract_location + "\\predict\\"
-labels_directory = zip_extract_location + "\\animals_labels_train.csv"
+external_drive_location = "D:\\CNN_Project_1_Animals_Data"
+
+data_directory = external_drive_location + "\\data\\"
+training_directory = external_drive_location + "\\train\\"
+testing_directory = external_drive_location + "\\test\\"
+predicting_directory = external_drive_location + "\\predict\\"
+labels_directory = external_drive_location + "\\animals_labels_train.csv"
+inceptionv3_weights = external_drive_location + "\\inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
 # This is the dataframe that reads from the csv that has all the labels for the image ids
 data = pd.read_csv(labels_directory).rename(columns={'Image_id':'image_id','Animal':'animal'})
 # Replaced '+' with a space because some labels were two words e.g. "German+Shepherd"
 data['animal'] = data.animal.str.replace('\+', ' ')
 #print(data[:10])
+
 
 '''
 This data splitting class assumes that the data is initially presented in one folder
@@ -61,14 +71,14 @@ class split_data_training_test():
         
         for test_name in self.test_list:
             move(self.data_path + test_name,self.test_path)
-        
+'''        
 print("Splitting data...")
 data_split = split_data_training_test(data_directory)
 data_split.move_training_to(training_directory)
 print("Data split into training directory")
 data_split.move_test_to(testing_directory)
 print("Data split into test directory")
-
+'''
 '''
 This categorization class assumes that the data has been presented in the following format:
 1 csv file with all the image ids in one column and their corresponding labels in another
@@ -106,13 +116,13 @@ class categorize_data():
             self.destination = self.directory + "\\" + animal + "\\"
             # Moves the image to the appropriate animal folder
             move(self.this_file, self.destination)
-
+'''
 animal_types = categorize_data(data)
 animal_types.in_directory(training_directory)
 print("Data categorized in the training directory")
 animal_types.in_directory(testing_directory)
 print("Data categorized in the testing directory")
-
+'''
 '''
 This class assumes that all the data has been moved into appropriately labeled
 subfolders in the training or testing folders.
@@ -145,32 +155,36 @@ class display():
       plt.title(file_name, loc='center')
       plt.show()
 
-display("buffalo", training_directory).numberOfTimes(4)
+#display("buffalo", training_directory).numberOfTimes(4)
 
-# Rescaling and augementations for the training data
-training_datagen = ImageDataGenerator(
-        rescale = 1./255,
-        rotation_range=40,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.2,
-        zoom_range=0.2,
-        horizontal_flip=True,
-        fill_mode='nearest')
-# Rescaling for the test data
-validation_datagen = ImageDataGenerator(rescale = 1./255)
+
+pre_trained_model = InceptionV3(input_shape = (150, 150, 3), 
+                                include_top = False, 
+                                weights = None  )
+pre_trained_model.load_weights(inceptionv3_weights)
+
+# Make all the layers in the pre-trained model non-trainable
+for layer in pre_trained_model.layers:
+  layer.trainable = False
+
+last_layer = pre_trained_model.get_layer('mixed7')
+print('last layer output shape: ', last_layer.output_shape)
+last_output = last_layer.output
   
-# Training and test generators label data based on the folder name
-train_generator = training_datagen.flow_from_directory(
-        # specify the output size and type of classification (binary, category, etc)
-        training_directory,
-        target_size=(150,150),
-        class_mode='categorical')
+x = Flatten()(last_output)
+x = Dense(1024, activation='relu')(x)
+x = Dropout(0.2)(x)
+predictions = Dense(30, activation='softmax')(x)
 
-validation_generator = validation_datagen.flow_from_directory(
-        testing_directory,
-        target_size=(150,150),
-        class_mode='categorical')
+model = Model(pre_trained_model.input, predictions)
+
+# Compile the model and specify the loss function, optimizer, and metrics to track
+model.compile(optimizer = RMSprop(lr=0.0001), 
+              loss = 'categorical_crossentropy',
+              metrics=['acc'])
+
+# Print the model summary
+model.summary()
 
 # This callback stops training if the accuracy reaches 90%
 class myCallback(tf.keras.callbacks.Callback):
@@ -179,9 +193,49 @@ class myCallback(tf.keras.callbacks.Callback):
             print("\nReached 90% accuracy so cancelling training!")
             self.model.stop_training = True
       
-      
 callbacks = myCallback()
+
+
+# Rescaling and augementations for the training data
+training_datagen = ImageDataGenerator(
+        rescale = 1./255.,
+        rotation_range=40,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=True)
+# Rescaling for the test data
+validation_datagen = ImageDataGenerator(rescale = 1./255.)
   
+# Training and test generators label data based on the folder name
+train_generator = training_datagen.flow_from_directory(
+        # specify the output size and type of classification (binary, category, etc)
+        training_directory,
+        batch_size = 20,
+        target_size=(150,150),
+        class_mode='categorical')
+
+validation_generator = validation_datagen.flow_from_directory(
+        testing_directory,
+        batch_size = 20,
+        target_size=(150,150),
+        class_mode='categorical')
+
+
+# Fit the model using the training and validation generators, specify the number of 
+# epochs to train for and how descriptive the output should be
+history = model.fit_generator(
+        train_generator,
+        validation_data = validation_generator,
+        steps_per_epoch = 100,
+        epochs = 100,
+        validation_steps = 50,
+        verbose = 1,
+        callbacks=[callbacks])
+
+
+'''
 model = tf.keras.models.Sequential([
         # The input shape is the desired size of the image 150x150 with 3 bytes color
         # This is the first convolution
@@ -203,21 +257,7 @@ model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(512, activation='relu'),
         tf.keras.layers.Dense(30, activation='softmax')])
 model.summary()
-# Compile the model and specify the loss function, optimizer, and metrics to track
-model.compile(loss = 'categorical_crossentropy', 
-              optimizer='rmsprop', 
-              metrics=['accuracy'])
-
-# Fit the model using the training and validation generators, specify the number of 
-# epochs to train for and how descriptive the output should be
-history = model.fit_generator(
-        train_generator,
-        validation_data = validation_generator,
-        steps_per_epoch = 10,
-        epochs = 20,
-        validation_steps = 10,
-        verbose = 1,
-        callbacks=[callbacks])
+'''
 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
