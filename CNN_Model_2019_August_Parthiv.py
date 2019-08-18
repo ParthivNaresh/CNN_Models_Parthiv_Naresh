@@ -1,32 +1,16 @@
 # -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
 
 import os
-import io
-import sys
-import zipfile
-import random
-import requests
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import tensorflow.contrib.eager as tfe
-import keras_preprocessing
-from shutil import copyfile, move
-from keras.preprocessing import image
+from shutil import move
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from sklearn.model_selection import train_test_split
-from tensorflow.keras import layers
-from tensorflow.keras import Model
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-tf.compat.v1.enable_eager_execution()
+tfe.compat.v1.enable_eager_execution()
 
 zip_data_file = "https://s3-ap-southeast-1.amazonaws.com/he-public-data/DL%23+Beginner.zip"
 zip_extract_location = "C:\\Users\\ParthivNaresh\\Documents\\animals_dataset"
@@ -75,7 +59,7 @@ print("Data split into training directory")
 data_split.move_test_to(testing_directory)
 print("Data split into test directory")
 
-
+'''
 This categorization class assumes that unzipped folder has presented data in the following format:
 1 csv file with all the image ids in one column and their corresponding labels in another
 2 subfolders (training and testing) that hold a series of images with their file names as their image ids
@@ -83,7 +67,7 @@ It will then create a set of folders within the training and testing folders cor
 unique categories from the csv file, and will move the images in the training and testing folders
 into their respective subfolders based on how they have been labeled in the csv file.
 This will make it easier to use the data in image generators later on.
-
+'''
 class categorize_data():
   
   # Initializes the distinct categories in the animal column
@@ -150,8 +134,8 @@ display("buffalo", training_directory).numberOfTimes(4)
 
 # Rescaling and augementations for the training data
 training_datagen = ImageDataGenerator(
-        rescale = 1./255)
-rotation_range=40,
+        rescale = 1./255,
+        rotation_range=40,
         width_shift_range=0.2,
         height_shift_range=0.2,
         shear_range=0.2,
