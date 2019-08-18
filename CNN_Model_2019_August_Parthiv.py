@@ -179,7 +179,7 @@ predictions = Dense(30, activation='softmax')(x)
 model = Model(pre_trained_model.input, predictions)
 
 # Compile the model and specify the loss function, optimizer, and metrics to track
-model.compile(optimizer = RMSprop(lr=0.0001), 
+model.compile(optimizer = RMSprop(lr=0.01), 
               loss = 'categorical_crossentropy',
               metrics=['acc'])
 
@@ -189,8 +189,9 @@ model.summary()
 # This callback stops training if the accuracy reaches 90%
 class myCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
-        if(logs.get('acc')>0.90):
-            print("\nReached 90% accuracy so cancelling training!")
+        if(logs.get('acc')>0.60):
+            model.save_weights(external_drive_location + "\\V3_Parthiv_Attempt_1.h5")
+            print("\nReached 60% accuracy so cancelling training!")
             self.model.stop_training = True
       
 callbacks = myCallback()
@@ -212,28 +213,43 @@ validation_datagen = ImageDataGenerator(rescale = 1./255.)
 train_generator = training_datagen.flow_from_directory(
         # specify the output size and type of classification (binary, category, etc)
         training_directory,
-        batch_size = 20,
+        batch_size = 104,
         target_size=(150,150),
         class_mode='categorical')
 
 validation_generator = validation_datagen.flow_from_directory(
         testing_directory,
-        batch_size = 20,
+        batch_size = 52,
         target_size=(150,150),
         class_mode='categorical')
 
-
 # Fit the model using the training and validation generators, specify the number of 
 # epochs to train for and how descriptive the output should be
-history = model.fit_generator(
-        train_generator,
-        validation_data = validation_generator,
-        steps_per_epoch = 100,
-        epochs = 100,
-        validation_steps = 50,
-        verbose = 1,
-        callbacks=[callbacks])
 
+history = model.fit_generator(
+    train_generator,
+    validation_data = validation_generator,
+    steps_per_epoch = 100,
+    epochs = 20,
+    validation_steps = 50,
+    verbose = 1,
+    callbacks=[callbacks])
+
+#model.save_weights(external_drive_location + "\\V3_Parthiv_Attempt_1_Interrupt.h5")
+acc = history.history['acc']
+val_acc = history.history['val_acc']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(len(acc))
+
+plt.plot(epochs, acc, 'r', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.legend(loc=0)
+plt.figure()
+
+plt.show()
 
 '''
 model = tf.keras.models.Sequential([
@@ -258,19 +274,3 @@ model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(30, activation='softmax')])
 model.summary()
 '''
-
-acc = history.history['acc']
-val_acc = history.history['val_acc']
-loss = history.history['loss']
-val_loss = history.history['val_loss']
-
-epochs = range(len(acc))
-
-plt.plot(epochs, acc, 'r', label='Training accuracy')
-plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
-plt.title('Training and validation accuracy')
-plt.legend(loc=0)
-plt.figure()
-
-
-plt.show()
