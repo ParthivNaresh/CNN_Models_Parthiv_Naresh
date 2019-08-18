@@ -20,10 +20,20 @@ training_directory = zip_extract_location + "\\train\\"
 testing_directory = zip_extract_location + "\\test\\"
 predicting_directory = zip_extract_location + "\\predict\\"
 labels_directory = zip_extract_location + "\\animals_labels_train.csv"
+# This is the dataframe that reads from the csv that has all the labels for the image ids
 data = pd.read_csv(labels_directory).rename(columns={'Image_id':'image_id','Animal':'animal'})
+# Replaced '+' with a space because some labels were two words e.g. "German+Shepherd"
 data['animal'] = data.animal.str.replace('\+', ' ')
 #print(data[:10])
 
+'''
+This data splitting class assumes that the data is initially presented in one folder
+and has already been shuffled.
+This class splits the data into a training and testing set with a ratio of 80% training
+and 20% testing.
+Categorization of the data into subfolders based on their labels is done in 
+categorize_data().
+'''
 class split_data_training_test():
     
     def __init__(self, data_path):
@@ -60,11 +70,11 @@ data_split.move_test_to(testing_directory)
 print("Data split into test directory")
 
 '''
-This categorization class assumes that unzipped folder has presented data in the following format:
+This categorization class assumes that the data has been presented in the following format:
 1 csv file with all the image ids in one column and their corresponding labels in another
 2 subfolders (training and testing) that hold a series of images with their file names as their image ids
 It will then create a set of folders within the training and testing folders corresponding to all
-unique categories from the csv file, and will move the images in the training and testing folders
+unique labels from the csv file, and will move the images in the training and testing folders
 into their respective subfolders based on how they have been labeled in the csv file.
 This will make it easier to use the data in image generators later on.
 '''
@@ -78,13 +88,13 @@ class categorize_data():
   def in_directory(self, directory):
     self.directory = directory
     
-    # Makes a directory for every animal in the specified directory
+    # Makes a sub-directory for every animal in the specified directory
     for animal in self.animal_categories:
         if not os.path.exists(self.directory + animal):
             os.mkdir(self.directory + animal)
     
     # Iterates through every file in the specified directory
-    # and finds the same file name in the dataframe with its
+    # and finds the same file name in the csv with its
     # relevant animal category and moves it to that animal folder
     for image_id in os.listdir(self.directory):
         if os.path.isfile(self.directory + image_id):
@@ -103,6 +113,11 @@ print("Data categorized in the training directory")
 animal_types.in_directory(testing_directory)
 print("Data categorized in the testing directory")
 
+'''
+This class assumes that all the data has been moved into appropriately labeled
+subfolders in the training or testing folders.
+This allows for a quick display of random images from that category.
+'''
 class display():
   
   def __init__(self, animal, directory):
@@ -157,6 +172,7 @@ validation_generator = validation_datagen.flow_from_directory(
         target_size=(150,150),
         class_mode='categorical')
 
+# This callback stops training if the accuracy reaches 90%
 class myCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         if(logs.get('acc')>0.90):
@@ -191,9 +207,9 @@ model.summary()
 model.compile(loss = 'categorical_crossentropy', 
               optimizer='rmsprop', 
               metrics=['accuracy'])
+
 # Fit the model using the training and validation generators, specify the number of 
 # epochs to train for and how descriptive the output should be
-
 history = model.fit_generator(
         train_generator,
         validation_data = validation_generator,
