@@ -12,6 +12,7 @@ and 20% testing.
 Categorization of the data into subfolders based on their labels is done in 
 categorize_data().
 '''
+
 class split_data_training_test():
     
     def __init__(self, data_path):

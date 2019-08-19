@@ -10,6 +10,7 @@ This class assumes that all the data has been moved into appropriately labeled
 subfolders in the training or testing folders.
 This allows for a quick display of random images from that category.
 '''
+
 class display_images():
   
   def __init__(self, animal, directory):

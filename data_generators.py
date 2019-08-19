@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-
+from constants import training_directory, testing_directory
 '''
 
 '''
-
-external_drive_location = "D:\\CNN_Project_1_Animals_Data"
-
-training_directory = external_drive_location + "\\train\\"
-testing_directory = external_drive_location + "\\test\\"
 
 # Rescaling and augementations for the training data
 training_datagen = ImageDataGenerator(

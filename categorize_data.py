@@ -12,6 +12,7 @@ unique labels from the csv file, and will move the images in the training and te
 into their respective subfolders based on how they have been labeled in the csv file.
 This will make it easier to use the data in image generators later on.
 '''
+
 class categorize_data():
   
   # Initializes the distinct categories in the animal column

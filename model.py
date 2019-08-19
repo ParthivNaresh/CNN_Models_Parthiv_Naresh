@@ -4,9 +4,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.applications.inception_v3 import InceptionV3
-
-external_drive_location = "D:\\CNN_Project_1_Animals_Data"
-inceptionv3_weights = external_drive_location + "\\inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
+from constants import inceptionv3_weights
 
 pre_trained_model = InceptionV3(input_shape = (150, 150, 3), 
                                 include_top = False, 
@@ -24,7 +22,7 @@ last_output = last_layer.output
   
 x = Flatten()(last_output)
 x = Dense(1024, activation='relu')(x)
-x = Dropout(0.2)(x)
+x = Dropout(0.5)(x)
 predictions = Dense(30, activation='softmax')(x)
 
 my_model = Model(pre_trained_model.input, predictions)
