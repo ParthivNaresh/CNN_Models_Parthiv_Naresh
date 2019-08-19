@@ -13,6 +13,7 @@ testing_directory = external_drive_location + "\\test\\"
 predicting_directory = external_drive_location + "\\predict\\"
 labels_directory = external_drive_location + "\\animals_labels_train.csv"
 inceptionv3_weights = external_drive_location + "\\inception_v3_weights_tf_dim_ordering_tf_kernels_notop.h5"
+resnet50_weights = external_drive_location + "\\resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5"
 
 data = pd.read_csv(labels_directory).rename(columns={'Image_id':'image_id','Animal':'animal'})
 data['animal'] = data.animal.str.replace('\+', ' ')
