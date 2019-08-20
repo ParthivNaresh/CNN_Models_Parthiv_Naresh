@@ -10,7 +10,7 @@ from split_data_training_test import split_data_training_test as split_data
 from categorize_data import categorize_data as categorize
 from display_images import display_images as display
 from data_generators import train_generator, validation_generator
-from model import my_model
+from Inception import my_model
 
 '''
 split = split_data(data_directory)
@@ -34,7 +34,7 @@ try:
     history = my_model.fit_generator(
     train_generator,
     validation_data = validation_generator,
-    steps_per_epoch = 100,
+    steps_per_epoch = 50,
     epochs = 20,
     validation_steps = 50,
     verbose = 1,
