@@ -6,6 +6,7 @@ zip_data_file = "https://s3-ap-southeast-1.amazonaws.com/he-public-data/DL%23+Be
 zip_extract_location = "C:\\Users\\ParthivNaresh\\Documents\\animals_dataset"
 
 external_drive_location = "D:\\CNN_Project_1_Animals_Data"
+github_drive_location = "D:\\CNN_Project_1_Animals_Of_Africa"
 
 data_directory = external_drive_location + "\\data\\"
 training_directory = external_drive_location + "\\train\\"
