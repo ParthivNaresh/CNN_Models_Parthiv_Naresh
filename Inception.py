@@ -11,7 +11,7 @@ from constants import github_drive_location
 
 input_img = Input(shape=(150, 150, 3))
 
-layer_1 = Conv2D(16, (3,3), activation='relu')(input_img)
+layer_1 = Conv2D(2, (3,3), activation='relu')(input_img)
 layer_2 = MaxPooling2D((2,2))(layer_1)
 
 layer_3 = Conv2D(32, (3,3), activation='relu')(layer_2)

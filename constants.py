@@ -13,6 +13,7 @@ training_directory = external_drive_location + "\\train\\"
 testing_directory = external_drive_location + "\\test\\"
 predicting_directory = external_drive_location + "\\predict\\"
 labels_directory = external_drive_location + "\\animals_labels_train.csv"
+visualizations = github_drive_location + '\\Visualizations\\'
 
 training_image = "D:\\train\\"
 
