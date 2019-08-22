@@ -9,10 +9,13 @@ external_drive_location = "D:\\CNN_Project_1_Animals_Data"
 github_drive_location = "D:\\CNN_Project_1_Animals_Of_Africa"
 
 data_directory = external_drive_location + "\\data\\"
-training_directory = external_drive_location + "\\train\\"
+#training_directory = external_drive_location + "\\train\\"
+training_directory = "C:\\Users\\ParthivNaresh\\Documents\\CNN_Models_Parthiv_Naresh\\train\\"
 testing_directory = external_drive_location + "\\test\\"
 predicting_directory = external_drive_location + "\\predict\\"
 labels_directory = external_drive_location + "\\animals_labels_train.csv"
 
-data = pd.read_csv(labels_directory).rename(columns={'Image_id':'image_id','Animal':'animal'})
-data['animal'] = data.animal.str.replace('\+', ' ')
+callback_cutoff_accuracy = 0.6
+
+#data = pd.read_csv(labels_directory).rename(columns={'Image_id':'image_id','Animal':'animal'})
+#data['animal'] = data.animal.str.replace('\+', ' ')
