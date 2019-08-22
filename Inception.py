@@ -36,7 +36,7 @@ layer_7 = Conv2D(48, (3,3), activation='relu')(layer_6)
 layer_8 = MaxPooling2D((2,2))(layer_7)
     
 ### 1st layer
-layer_7_inception = Conv2D(16, (1,1), padding='same', activation='relu')(layer_8)
+layer_7_inception = Conv2D(16, (3,3), padding='same', activation='relu')(layer_8)
 layer_8_inception = Conv2D(16, (3,3), padding='same', activation='relu')(layer_7_inception)
 
 layer_9_inception = Conv2D(16, (1,1), padding='same', activation='relu')(layer_8)
