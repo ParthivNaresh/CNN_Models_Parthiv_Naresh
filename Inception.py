@@ -55,12 +55,12 @@ dense_3 = Dense(150, activation='relu')(dense_2)
 output = Dense(30, activation='softmax')(dense_3)
 
 my_model = Model([input_img], output)
-'''
+
 plot_model(my_model,
            to_file = github_drive_location + '\\InceptionModel.png',
            show_shapes=True,
            show_layer_names=True)
-'''
+
 # Print the model summary
 my_model.summary()
 
