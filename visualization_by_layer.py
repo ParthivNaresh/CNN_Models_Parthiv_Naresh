@@ -111,8 +111,8 @@ class visualization_by_layer():
                 get_layer_information(layer.name.lower())
                 
                 plt.grid(False)
-                #plt.imshow(display_grid, aspect='auto', cmap='viridis')
-                
+                # Displays the plot in the console
+                plt.imshow(display_grid, aspect='auto', cmap='viridis')
                 # Saves the output of every layer in the specified folder so they
                 # can be combined later
                 plt.savefig(visualizations + '\\' + str(position) + '.png', bbox_inches='tight')

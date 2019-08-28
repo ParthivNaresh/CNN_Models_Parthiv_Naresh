@@ -11,41 +11,60 @@ from constants import github_drive_location
 
 input_img = Input(shape=(150, 150, 3))
 
-layer_1 = Conv2D(2, (3,3), activation='relu')(input_img)
-layer_2 = MaxPooling2D((2,2))(layer_1)
+layer_1 = Conv2D(16, (3,3), activation='relu')(input_img)
+layer_2 = Conv2D(32, (3,3), activation='relu')(layer_1)
+layer_3 = MaxPooling2D((2,2))(layer_2)
 
-layer_3 = Conv2D(32, (3,3), activation='relu')(layer_2)
-layer_4 = MaxPooling2D((2,2))(layer_3)
+layer_4 = Conv2D(64, (3,3), activation='relu')(layer_3)
+layer_5 = MaxPooling2D((2,2))(layer_4)
     
 ### 1st layer
-layer_1_inception = Conv2D(12, (1,1), padding='same', activation='relu')(layer_4)
-layer_2_inception = Conv2D(12, (3,3), padding='same', activation='relu')(layer_1_inception)
+layer_1_1_inception = Conv2D(20, (1,1), padding='same', activation='relu')(layer_5)
+layer_1_2_inception = MaxPooling2D((2,2), strides=(1,1), padding='same')(layer_5)
+layer_1_3_inception = Conv2D(12, (1,1), padding='same', activation='relu')(layer_5)
+layer_1_4_inception = MaxPooling2D((3,3), strides=(1,1), padding='same')(layer_5)
+layer_1_5_inception = Conv2D(12, (1,1), padding='same', activation='relu')(layer_5)
 
-layer_3_inception = Conv2D(12, (1,1), padding='same', activation='relu')(layer_4)
-layer_4_inception = Conv2D(12, (5,5), padding='same', activation='relu')(layer_3_inception)
+### 2nd layer
+layer_2_1_inception = Conv2D(12, (1,3), padding='same', activation='relu')(layer_1_1_inception)
+layer_2_2_inception = Conv2D(24, (1,1), padding='same', activation='relu')(layer_1_2_inception)
+layer_2_3_inception = Conv2D(12, (1,5), padding='same', activation='relu')(layer_1_3_inception)
+layer_2_4_inception = Conv2D(24, (1,1), padding='same', activation='relu')(layer_1_4_inception)
+layer_2_5_inception = Conv2D(12, (1,3), padding='same', activation='relu')(layer_1_5_inception)
 
-layer_5_inception = MaxPooling2D((3,3), strides=(1,1), padding='same')(layer_4)
-layer_6_inception = Conv2D(12, (1,1), padding='same', activation='relu')(layer_5_inception)
+### 3rd layer
+layer_3_1_inception = Conv2D(12, (3,1), padding='same', activation='relu')(layer_2_1_inception)
+layer_3_2_inception = Conv2D(12, (5,1), padding='same', activation='relu')(layer_2_3_inception)
+layer_3_3_inception = Conv2D(12, (3,1), padding='same', activation='relu')(layer_2_5_inception)
 
-mid_1 = tf.keras.layers.concatenate([layer_2_inception, layer_4_inception, layer_6_inception], axis = 3)
+mid_1 = tf.keras.layers.concatenate([layer_3_1_inception, layer_2_2_inception,
+                                     layer_3_2_inception, layer_2_4_inception,
+                                     layer_3_3_inception], axis = 3)
 
-layer_5 = Conv2D(36, (3,3), activation='relu')(mid_1)
-layer_6 = MaxPooling2D((2,2))(layer_5)
+layer_6 = Conv2D(84, (3,3), activation='relu')(mid_1)
+layer_7 = MaxPooling2D((2,2))(layer_6)
 
-layer_7 = Conv2D(48, (3,3), activation='relu')(layer_6)
-layer_8 = MaxPooling2D((2,2))(layer_7)
-    
-### 1st layer
-layer_7_inception = Conv2D(16, (3,3), padding='same', activation='relu')(layer_8)
-layer_8_inception = Conv2D(16, (3,3), padding='same', activation='relu')(layer_7_inception)
+layer_8 = Conv2D(96, (3,3), activation='relu')(layer_7)
+layer_9 = MaxPooling2D((2,2))(layer_8)
 
-layer_9_inception = Conv2D(16, (1,1), padding='same', activation='relu')(layer_8)
-layer_10_inception = Conv2D(16, (5,5), padding='same', activation='relu')(layer_9_inception)
+### 4st layer
+layer_4_1_inception = Conv2D(24, (1,1), padding='same', activation='relu')(layer_9)
+layer_4_2_inception = MaxPooling2D((2,2), strides=(1,1), padding='same')(layer_9)
+layer_4_3_inception = Conv2D(24, (1,1), padding='same', activation='relu')(layer_9)
 
-layer_11_inception = MaxPooling2D((3,3), strides=(1,1), padding='same')(layer_8)
-layer_12_inception = Conv2D(16, (1,1), padding='same', activation='relu')(layer_11_inception)
+### 5th layer
+layer_5_1_inception = Conv2D(24, (3,3), padding='same', activation='relu')(layer_4_1_inception)
+layer_5_2_inception = Conv2D(16, (1,1), padding='same', activation='relu')(layer_4_2_inception)
+layer_5_3_inception = Conv2D(24, (1,3), padding='same', activation='relu')(layer_4_3_inception)
+layer_5_4_inception = Conv2D(24, (3,1), padding='same', activation='relu')(layer_4_3_inception)
 
-mid_2 = tf.keras.layers.concatenate([layer_8_inception, layer_10_inception, layer_12_inception], axis = 3)
+### 5th layer
+layer_6_1_inception = Conv2D(24, (1,3), padding='same', activation='relu')(layer_5_1_inception)
+layer_6_2_inception = Conv2D(24, (3,1), padding='same', activation='relu')(layer_5_1_inception)
+
+mid_2 = tf.keras.layers.concatenate([layer_5_2_inception, layer_5_3_inception,
+                                     layer_5_4_inception, layer_6_1_inception,
+                                     layer_6_2_inception], axis = 3)
 
 flat_1 = Flatten()(mid_2)
 

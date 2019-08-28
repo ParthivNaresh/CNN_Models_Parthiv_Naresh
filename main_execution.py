@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 import tensorflow.contrib.eager as tfe
-tfe.enable_eager_execution()
+#tfe.enable_eager_execution()
 
 from constants import external_drive_location
 import callback as callback_file
@@ -30,18 +30,14 @@ display("buffalo", training_directory).numberOfTimes(4)
 
 # Fit the model using the training and validation generators, specify the number of 
 # epochs to train for and how descriptive the output should be
-try:
-    history = my_model.fit_generator(
-    train_generator,
-    validation_data = validation_generator,
-    steps_per_epoch = 50,
-    epochs = 20,
-    validation_steps = 50,
-    verbose = 1,
-    callbacks=[callback_file.myCallback()])
-except:
-    print("Training interrupted, saving model")
-    my_model.save_weights(external_drive_location + "\\V3_Parthiv_Attempt_1_Interrupt.h5")
+history = my_model.fit_generator(
+train_generator,
+validation_data = validation_generator,
+steps_per_epoch = 50,
+epochs = 20,
+validation_steps = 50,
+verbose = 1,
+callbacks=[callback_file.myCallback()])
     
 acc = history.history['acc']
 val_acc = history.history['val_acc']
