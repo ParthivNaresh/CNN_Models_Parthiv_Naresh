@@ -13,9 +13,12 @@ This is the beginning of a series of projects working with Convolutional Neural 
 
 ## Package Installer & IDE
 
-I'd recommend using Anaconda as a package manager and the accompanying Spyder IDE.
+~~I'd recommend using Anaconda as a package manager and the accompanying Spyder IDE.
 I prefer Anaconda because of the ease with which you can set up environments to keep
-package installations separate, but obviously you can use anything you like.
+package installations separate, but obviously you can use anything you like.~~
+
+Working over a notebook is a cleaner way of approaching simpler machine learning problems.
+Using Google Colab makes it more straightforward to mount data over Drive and then import it for training/validationt/testing.
 
 ## Project 1 - Animal Classifier
 
